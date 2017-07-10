@@ -22,9 +22,11 @@ module CapistranoDeploybot
 
       return if !@opts[:environments].include?(rails_env.to_s) || current_revision == previous_revision
 
+      application_name = @opts[:application_name]
+      deploy_target = deploy_target(rails_env, application_name)
       payload = {
         username: @opts[:username],
-        text: payload_text(current_revision, previous_revision, rails_env)
+        text: payload_text(current_revision, previous_revision, deploy_target)
       }
 
       @opts[:webhooks].each do |webhook|
@@ -34,8 +36,12 @@ module CapistranoDeploybot
 
     private
 
-    def payload_text(current_revision, previous_revision, rails_env)
-      "Deployed to #{rails_env}:\n" + `git shortlog #{previous_revision}..#{current_revision}`
+    def deploy_target(rails_env, application_name)
+      application_name.nil? ? rails_env : "#{application_name} (#{rails_env})"
+    end
+
+    def payload_text(current_revision, previous_revision, deploy_target)
+      "Deployed to #{deploy_target}:\n" + `git shortlog #{previous_revision}..#{current_revision}`
     end
 
     def post_to_webhook(payload)
