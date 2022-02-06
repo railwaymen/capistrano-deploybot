@@ -72,7 +72,7 @@ module CapistranoDeploybot
       end
     
       message = "[deploybot] Notified JIRA webhooks with tickets: #{jira_issues.join(', ')}"
-      message << "and release: #{release_tag}" if release_tag.present? 
+      message << "and release: #{release_tag}" if release_tag 
 
       @env.info(message)  
     end
