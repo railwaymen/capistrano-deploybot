@@ -64,7 +64,7 @@ module CapistranoDeploybot
 
       payload = {
         issues: jira_issues,
-        data: releaseVersion: release_tag
+        data: { releaseVersion: release_tag }
       }
       
       webhooks.each do |webhook|
