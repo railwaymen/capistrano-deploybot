@@ -60,15 +60,21 @@ module CapistranoDeploybot
       jira_issues = extract_jira_ids_from_commits(current_revision, previous_revision)
       return if jira_issues.empty?
 
+      release_tag = ENV['CI_COMMIT_TAG']
+
       payload = {
-        issues: jira_issues
+        issues: jira_issues,
+        data: { releaseVersion: release_tag }
       }
       
       webhooks.each do |webhook|
         post_to_webhook(webhook, payload)
       end
+    
+      message = "[deploybot] Notified JIRA webhooks with tickets: #{jira_issues.join(', ')}"
+      message << " and release: #{release_tag}" if release_tag 
 
-      @env.info("[deploybot] Notified JIRA webhooks with tickets: #{jira_issues.join(', ')}")  
+      @env.info(message)  
     end
 
     def deploy_target(rails_env, application_name)
