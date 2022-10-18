@@ -7,6 +7,7 @@ module CapistranoDeploybot
   class Capistrano
     DEFAULT_OPTIONS = {
       username: :autodeploy,
+      jira_url: '',
       environments: {
         staging: {
           slack_webhooks: [],
@@ -15,7 +16,7 @@ module CapistranoDeploybot
       }
     }
 
-    JIRA_TICKET_ID_REGEXP = /[A-Z]{2,}-\d+/
+    JIRA_TICKET_ID_REGEXP = /([A-Z]{2,}-\d+)/
 
     def initialize(env)
       @env = env
@@ -87,7 +88,9 @@ module CapistranoDeploybot
     end
 
     def payload_text(current_revision, previous_revision, deploy_target)
-      "Deployed to #{deploy_target}:\n" + `git shortlog #{previous_revision}..#{current_revision}`
+      message = "Deployed to #{deploy_target}:\n" + `git shortlog #{previous_revision}..#{current_revision}`
+      message.split("\n").map { |s| s.gsub(JIRA_TICKET_ID_REGEXP, '[\1]' + "(#{URI(@opts[:jira_url]).to_s.chomp('/')}/browse/" + '\1' + ')') }.join("\n") if @opts[:jira_url].present?
+      message
     end
 
     def post_to_webhook(url, payload)
