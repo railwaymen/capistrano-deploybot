@@ -89,7 +89,7 @@ module CapistranoDeploybot
 
     def payload_text(current_revision, previous_revision, deploy_target)
       message = "Deployed to #{deploy_target}:\n" + `git shortlog #{previous_revision}..#{current_revision}`
-      message.split("\n").map { |s| s.gsub(JIRA_TICKET_ID_REGEXP, '[\1]' + "(#{URI(@opts[:jira_url]).to_s.chomp('/')}/browse/" + '\1' + ')') }.join("\n") if @opts[:jira_url]
+      message = message.split("\n").map { |s| s.gsub(JIRA_TICKET_ID_REGEXP, '[\1]' + "(#{URI(@opts[:jira_url]).to_s.chomp('/')}/browse/" + '\1' + ')') }.join("\n") if @opts[:jira_url]
       message
     end
 
